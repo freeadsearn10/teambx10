@@ -125,17 +125,18 @@
 
     <div class="container animate__animated animate__fadeIn">
         <h2>🚀 Exclusive Ad Experience</h2>
-        <p>Automatic ad viewing system. Rewards are tracked!</p>
+        <p>Tap a button below, view tailored ads, and unlock exciting rewards! 💼✨</p>
         <div>
-            <button id="showAdButton1" class="btn btn-primary" disabled>SERVER 1</button>
-            <button id="showAdButton2" class="btn btn-success" disabled>SERVER 2</button>
-            <button id="showAdButton3" class="btn btn-warning" disabled>SERVER 3</button>
-            <button id="showAdButton4" class="btn btn-red" disabled>SERVER 4</button>
+            <button id="showAdButton1" class="btn btn-primary">SERVER 1✅</button>
+            <button id="showAdButton2" class="btn btn-success">SERVER 2✅</button>
+            <button id="showAdButton3" class="btn btn-warning">SERVER 3✅</button>
+            <button id="showAdButton4" class="btn btn-red">SERVER 4✅</button>
         </div>
         <div class="click-count">
-            <strong>State Man:</strong> <br>
+            <strong>State Man:</strong><br>
             Monthly Clicks: <span id="monthlyClicks">0</span><br>
-            Today's Clicks: <span id="dailyClicks">0</span>
+            Today's Clicks: <span id="dailyClicks">0</span><br>
+            Your IP: <span id="userIp">Fetching...</span>
         </div>
     </div>
 
@@ -159,31 +160,41 @@
             document.getElementById('dailyClicks').textContent = dailyClicks;
         }
 
-        function autoClickAd(buttonId) {
+        function showAd(buttonId) {
             show_8582316().then(() => {
                 dailyClicks++;
                 monthlyClicks++;
                 updateClicks();
-                toastr.success(`Ad viewed on ${buttonId}. Reward granted!`, 'Success');
+                toastr.success(`You have watched the ad on ${buttonId} and earned a reward!`, 'Congratulations');
             }).catch(error => {
-                toastr.error('Error displaying ad.', 'Error');
+                toastr.error('There was an error displaying the ad.', 'Error');
                 console.error(error);
             });
         }
 
-        function startAutoSystem() {
-            let buttons = ['SERVER 1', 'SERVER 2', 'SERVER 3', 'SERVER 4'];
-            let index = 0;
-            setInterval(() => {
-                autoClickAd(buttons[index]);
-                index = (index + 1) % buttons.length;
-            }, 3000); // 3 seconds interval
-        }
+        document.getElementById('showAdButton1').addEventListener('click', function () {
+            showAd('SERVER 1');
+        });
 
-        // Start auto-click system on page load
-        window.onload = () => {
-            startAutoSystem();
-        };
+        document.getElementById('showAdButton2').addEventListener('click', function () {
+            showAd('SERVER 2');
+        });
+
+        document.getElementById('showAdButton3').addEventListener('click', function () {
+            showAd('SERVER 3');
+        });
+
+        document.getElementById('showAdButton4').addEventListener('click', function () {
+            showAd('SERVER 4');
+        });
+
+        // Fetch User IP
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userIp').textContent = data.ip;
+            })
+            .catch(error => console.error('Error fetching IP:', error));
     </script>
 </body>
 
