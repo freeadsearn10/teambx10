@@ -97,6 +97,13 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        .ad-status {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
     </style>
 </head>
 
@@ -118,6 +125,7 @@
             Today's Clicks: <span id="dailyClicks">0</span><br>
             Your IP: <span id="userIp">Fetching...</span>
         </div>
+        <div class="ad-status" id="adStatus"></div>
     </div>
 
     <footer>
@@ -140,24 +148,22 @@
             const storedData = JSON.parse(localStorage.getItem('clickData')) || {};
             const now = new Date();
 
-            // Check if stored date exists and reset if it's been 24 hours
             if (storedData.date) {
                 const storedDate = new Date(storedData.date);
                 const hoursDifference = Math.abs(now - storedDate) / 36e5;
 
                 if (hoursDifference >= 24) {
-                    dailyClicks = 0; // Reset daily clicks after 24 hours
-                    storedData.date = now.toISOString(); // Update stored date
+                    dailyClicks = 0;
+                    storedData.date = now.toISOString();
                 } else {
                     dailyClicks = storedData.dailyClicks || 0;
                 }
             } else {
-                storedData.date = now.toISOString(); // Set current date if not exists
+                storedData.date = now.toISOString();
             }
 
             monthlyClicks = storedData.monthlyClicks || 0;
 
-            // Save back to localStorage
             localStorage.setItem('clickData', JSON.stringify({
                 monthlyClicks,
                 dailyClicks,
@@ -198,9 +204,14 @@
             const interval = setInterval(() => {
                 if (count >= 5) {
                     clearInterval(interval);
-                    toastr.info('Auto ad display finished!', 'Info');
+                    document.getElementById('adStatus').textContent = "Ad Showing Successful!";
+                    document.getElementById('adStatus').style.color = "green";
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000); // Refresh the page after 3 seconds
                     return;
                 }
+
                 show_8582316().then(() => {
                     dailyClicks++;
                     monthlyClicks++;
