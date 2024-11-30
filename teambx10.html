@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -85,10 +85,25 @@
             box-shadow: 0 5px 15px rgba(255, 65, 108, 0.5);
         }
 
+        .click-count {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #00ff99;
+        }
+
         footer {
             margin-top: 20px;
             font-size: 0.9rem;
             color: #b0b0b0;
+        }
+
+        footer a {
+            color: #00ffcc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -96,12 +111,16 @@
 
 <div class="container animate__animated animate__fadeIn">
    <h2>🚀 Exclusive Ad Experience</h2>
-<p>Tap a button below, view tailored ads, and unlock exciting rewards! 💼✨</p>
-<div>
+   <p>Tap a button below, view tailored ads, and unlock exciting rewards! 💼✨</p>
+   <div>
         <button id="showAdButton1" class="btn btn-primary">SERVER 1✅</button>
         <button id="showAdButton2" class="btn btn-success">SERVER 2✅</button>
         <button id="showAdButton3" class="btn btn-warning">SERVER 3✅</button>
         <button id="showAdButton4" class="btn btn-red">SERVER 4✅</button>
+    </div>
+    <div class="click-count">
+        Total Clicks: <span id="clickCount">0</span><br>
+        Your IP: <span id="userIp">Fetching...</span>
     </div>
 </div>
 
@@ -109,17 +128,21 @@
     Website Owner: Asraf Ahmed<br>
     Category: Earn From Online<br>
     Languages: English, Bangla, Hindi<br>
+    Contact Admin: <a href="https://t.me/Crypto_X_Bd" target="_blank">Telegram</a><br>
     © 2024 Premium Ad Page. All Rights Reserved.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-<script src='//niphaumeenses.net/vignette.min.js' data-zone='8582316' data-sdk='show_8582316'></script>
+<script src="//niphaumeenses.net/vignette.min.js" data-zone="8582316" data-sdk="show_8582316"></script>
 
 <script>
+    let clickCount = 0;
+
     function showAd(buttonId) {
         show_8582316().then(() => {
+            clickCount++;
+            document.getElementById('clickCount').textContent = clickCount;
             toastr.success(`You have watched the ad on ${buttonId} and earned a reward!`, 'Congratulations');
         }).catch((error) => {
             toastr.error('There was an error displaying the ad.', 'Error');
@@ -142,6 +165,14 @@
     document.getElementById('showAdButton4').addEventListener('click', function() {
         showAd('Show Ad 4');
     });
+
+    // Fetch User IP
+    fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('userIp').textContent = data.ip;
+        })
+        .catch(error => console.error('Error fetching IP:', error));
 </script>
 </body>
 </html>
