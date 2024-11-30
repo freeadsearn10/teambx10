@@ -12,7 +12,7 @@
 
     <style>
         body {
-            background: linear-gradient(to bottom, #1e1e2f, #3b3b5c);
+            background: linear-gradient(to bottom, #121212, #3e3e5e);
             color: white;
             font-family: 'Arial', sans-serif;
             text-align: center;
@@ -21,41 +21,46 @@
         .container {
             margin-top: 50px;
             padding: 20px;
-            background: #2d2d4a;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            background: #1f1f3d;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         }
 
         h2 {
             font-size: 2.5rem;
             font-weight: bold;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .btn {
-            font-size: 1.1rem;
-            padding: 10px 20px;
+            font-size: 1.2rem;
+            padding: 12px 25px;
             margin: 10px;
-            border-radius: 25px;
+            border-radius: 30px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+        }
+
         .btn-primary {
-            background: linear-gradient(to right, #ff512f, #f09819);
+            background: linear-gradient(to right, #6a11cb, #2575fc);
             border: none;
             color: white;
         }
 
         .btn-success {
-            background: linear-gradient(to right, #56ab2f, #a8e063);
+            background: linear-gradient(to right, #11998e, #38ef7d);
             border: none;
             color: white;
         }
 
         .btn-warning {
-            background: linear-gradient(to right, #ff9a00, #ff5200);
+            background: linear-gradient(to right, #f7971e, #ffd200);
             border: none;
             color: white;
         }
@@ -66,32 +71,10 @@
             color: white;
         }
 
-        .marquee {
-            background: white;
-            color: green;
-            padding: 10px 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            margin-top: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
-        }
-
-        .marquee span {
-            display: inline-block;
-            padding-left: 100%;
-            animation: slide 8s linear infinite;
-        }
-
-        @keyframes slide {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
+        .btn-auto {
+            background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59);
+            border: none;
+            color: white;
         }
 
         .click-count {
@@ -119,10 +102,6 @@
 
 <body>
 
-    <div class="marquee">
-        <span>আমাদের এই ওয়েবসাইটটি কিনতে হলে অবশ্যই এডমিনের সাথে কথা বলতে হবে।</span>
-    </div>
-
     <div class="container animate__animated animate__fadeIn">
         <h2>🚀 Exclusive Ad Experience</h2>
         <p>Tap a button below, view tailored ads, and unlock exciting rewards! 💼✨</p>
@@ -131,6 +110,7 @@
             <button id="showAdButton2" class="btn btn-success">SERVER 2✅</button>
             <button id="showAdButton3" class="btn btn-warning">SERVER 3✅</button>
             <button id="showAdButton4" class="btn btn-red">SERVER 4✅</button>
+            <button id="autoAdButton" class="btn btn-auto">AUTO AD SHOW</button>
         </div>
         <div class="click-count">
             <strong>State Man:</strong><br>
@@ -155,9 +135,49 @@
         let monthlyClicks = 0;
         let dailyClicks = 0;
 
+        // Initialize clicks from localStorage
+        function initializeClicks() {
+            const storedData = JSON.parse(localStorage.getItem('clickData')) || {};
+            const now = new Date();
+
+            // Check if stored date exists and reset if it's been 24 hours
+            if (storedData.date) {
+                const storedDate = new Date(storedData.date);
+                const hoursDifference = Math.abs(now - storedDate) / 36e5;
+
+                if (hoursDifference >= 24) {
+                    dailyClicks = 0; // Reset daily clicks after 24 hours
+                    storedData.date = now.toISOString(); // Update stored date
+                } else {
+                    dailyClicks = storedData.dailyClicks || 0;
+                }
+            } else {
+                storedData.date = now.toISOString(); // Set current date if not exists
+            }
+
+            monthlyClicks = storedData.monthlyClicks || 0;
+
+            // Save back to localStorage
+            localStorage.setItem('clickData', JSON.stringify({
+                monthlyClicks,
+                dailyClicks,
+                date: storedData.date,
+            }));
+
+            updateClicks();
+        }
+
         function updateClicks() {
             document.getElementById('monthlyClicks').textContent = monthlyClicks;
             document.getElementById('dailyClicks').textContent = dailyClicks;
+        }
+
+        function saveClicks() {
+            localStorage.setItem('clickData', JSON.stringify({
+                monthlyClicks,
+                dailyClicks,
+                date: JSON.parse(localStorage.getItem('clickData')).date,
+            }));
         }
 
         function showAd(buttonId) {
@@ -165,11 +185,34 @@
                 dailyClicks++;
                 monthlyClicks++;
                 updateClicks();
+                saveClicks();
                 toastr.success(`You have watched the ad on ${buttonId} and earned a reward!`, 'Congratulations');
             }).catch(error => {
                 toastr.error('There was an error displaying the ad.', 'Error');
                 console.error(error);
             });
+        }
+
+        function autoShowAds() {
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count >= 5) {
+                    clearInterval(interval);
+                    toastr.info('Auto ad display finished!', 'Info');
+                    return;
+                }
+                show_8582316().then(() => {
+                    dailyClicks++;
+                    monthlyClicks++;
+                    updateClicks();
+                    saveClicks();
+                    toastr.success('Ad displayed and reward granted!', 'Success');
+                }).catch(error => {
+                    toastr.error('Error during ad display.', 'Error');
+                    console.error(error);
+                });
+                count++;
+            }, 6000); // 6 seconds interval
         }
 
         document.getElementById('showAdButton1').addEventListener('click', function () {
@@ -188,6 +231,8 @@
             showAd('SERVER 4');
         });
 
+        document.getElementById('autoAdButton').addEventListener('click', autoShowAds);
+
         // Fetch User IP
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
@@ -195,6 +240,9 @@
                 document.getElementById('userIp').textContent = data.ip;
             })
             .catch(error => console.error('Error fetching IP:', error));
+
+        // Initialize clicks when the page loads
+        initializeClicks();
     </script>
 </body>
 
